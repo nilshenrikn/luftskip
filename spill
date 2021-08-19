@@ -1,0 +1,126 @@
+import pygame
+from pygame import mixer
+import random
+
+pygame.init()
+vindu = pygame.display.set_mode((1000, 600))
+pygame.display.set_caption("Luftskip!")
+
+img_bg = pygame.image.load("/Users/19nednil/Desktop/Luftskip!/Himmel/himmel.png")
+bg1, bg2 = pygame.transform.scale(img_bg, (1020, 620)), pygame.transform.scale(img_bg, (1020, 620))
+bg1_x, bg2_x = -30, 970
+fil_tekst_start = pygame.image.load("/Users/19nednil/Desktop/Luftskip!/Diverse/tekst-start.png")
+tekst_start = pygame.transform.scale(fil_tekst_start, (390, 26))
+
+mixer.music.load("/Users/19nednil/Desktop/Luftskip!/Lyd/bakgrunnslyd.wav")
+mixer.music.play()
+lyd_kollisjon = pygame.mixer.Sound("/Users/19nednil/Desktop/Luftskip!/Lyd/kollisjon.wav")
+
+img_luftskip = pygame.image.load("/Users/19nednil/Desktop/Luftskip!/Luftskip/luftskip.png")
+luftskip = pygame.transform.scale(img_luftskip, (195, 100))
+tb_luftskip = pygame.Rect(400, 200, 194, 80)
+tb_luftskip.x = -300
+tb_luftskip.y = 240
+v_opp, v_ned = 2, 3
+
+img_fugl = pygame.image.load("/Users/19nednil/Desktop/Luftskip!/Fugl/fugl.png")
+fugl = pygame.transform.scale(img_fugl, (50, 20))
+tb_fugl1, tb_fugl2 = fugl.get_rect(), fugl.get_rect()
+tb_fugl3, tb_fugl4 = fugl.get_rect(), fugl.get_rect()
+tb_fugl1.x, tb_fugl2.x = random.randint(1200, 1800), random.randint(1200, 1800)
+tb_fugl3.x, tb_fugl4.x = random.randint(1200, 1800), random.randint(1200, 1800)
+tb_fugl1.y, tb_fugl2.y = random.randint(20, 135), random.randint(140, 275)
+tb_fugl3.y, tb_fugl4.y = random.randint(295, 430), random.randint(455, 580)
+v_fugl = 2
+
+bevegelse, start, tekst1 = False, False, False
+
+while True:
+    pygame.time.delay(1)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+
+    pygame.draw.ellipse(vindu, (0, 0, 0), tb_luftskip, 4)
+    vindu.blit(bg1, (bg1_x, 0))
+    vindu.blit(bg2, (bg2_x, 0))
+    vindu.blit(luftskip, (tb_luftskip.x, tb_luftskip.y))
+    vindu.blit(fugl, (tb_fugl1.x, tb_fugl1.y))
+    vindu.blit(fugl, (tb_fugl2.x, tb_fugl2.y))
+    vindu.blit(fugl, (tb_fugl3.x, tb_fugl3.y))
+    vindu.blit(fugl, (tb_fugl4.x, tb_fugl4.y))
+
+    if tekst1 is True:
+        vindu.blit(tekst_start, (340, 294))
+
+    if tb_luftskip.y >= 513:
+        tb_luftskip.y = 513
+    if tb_luftskip.y <= -2.7:
+        tb_luftskip.y = -2.7
+
+    knapp = pygame.key.get_pressed()
+
+    def bevegelse_opp():
+        tb_luftskip.y -= v_opp
+
+    def bevegelse_ned():
+        tb_luftskip.y += v_opp
+
+    if knapp[pygame.K_SPACE] and bevegelse is True:
+        bevegelse_opp()
+        start = True
+
+    elif start is True:
+        bevegelse_ned()
+
+    if start is True:
+        tb_fugl1.x -= v_fugl
+        tb_fugl2.x -= v_fugl
+        tb_fugl3.x -= v_fugl
+        tb_fugl4.x -= v_fugl
+    if tb_fugl1.x < -40:
+        tb_fugl1.x, tb_fugl1.y = random.randint(1040, 1800), random.randint(20, 135)
+    if tb_fugl2.x < -40:
+        tb_fugl2.x, tb_fugl2.y = random.randint(1040, 1800), random.randint(140, 275)
+    if tb_fugl3.x < -40:
+        tb_fugl3.x, tb_fugl3.y = random.randint(1040, 1800), random.randint(295, 430)
+    if tb_fugl4.x < -40:
+        tb_fugl4.x, tb_fugl4.y = random.randint(1040, 1800), random.randint(455, 580)
+
+    if tb_luftskip.colliderect(tb_fugl1):
+        tb_fugl1.x, tb_fugl1.y = random.randint(1040, 1800), random.randint(20, 135)
+        pygame.mixer.Sound.play(lyd_kollisjon)
+    if tb_luftskip.colliderect(tb_fugl2):
+        tb_fugl2.x, tb_fugl2.y = random.randint(1040, 1800), random.randint(20, 135)
+        pygame.mixer.Sound.play(lyd_kollisjon)
+    if tb_luftskip.colliderect(tb_fugl3):
+        tb_fugl3.x, tb_fugl3.y = random.randint(1040, 1800), random.randint(20, 135)
+        pygame.mixer.Sound.play(lyd_kollisjon)
+    if tb_luftskip.colliderect(tb_fugl4):
+        tb_fugl4.x, tb_fugl4.y = random.randint(1040, 1800), random.randint(20, 135)
+        pygame.mixer.Sound.play(lyd_kollisjon)
+
+    if tb_luftskip.x < 130:
+        tb_luftskip.x += 2
+    if tb_luftskip.x == 130:
+        bevegelse = True
+
+    if tb_luftskip.x == 130 and start is False:
+        tekst1 = True
+    if start is True:
+        tekst1 = False
+
+    if bevegelse is False:
+        bg1_x -= 0.6
+        bg2_x -= 0.6
+    else:
+        bg1_x -= 0.2
+        bg2_x -= 0.2
+    if bg1_x <= -1030:
+        bg1_x = 970
+    if bg2_x <= -1030:
+        bg2_x = 970
+
+    pygame.display.update()
+    
